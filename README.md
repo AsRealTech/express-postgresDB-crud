@@ -3,7 +3,7 @@
 
 A simple Express.js app demonstrating routing, 404 handling, and error middleware.
 
-## 🚀 Setup Instructions
+##  Setup Instructions
 
 bash
 git clone <your-repo-url>
