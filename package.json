@@ -1,5 +1,5 @@
 {
-  "name": "restapi",
+  "name": "express-postgres-crud",
   "version": "1.0.0",
   "description": "rest api",
   "main": "index.js",
