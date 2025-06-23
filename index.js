@@ -1,35 +1,75 @@
-import express from "express";
-import itemsRoutes from "./routes/itemsRoutes.js";
+const express = require('express');
+const pool = require('./data/db');
+const app = express();
 
-const PORT = process.env.PORT || 5000;
-const app  = express();
 app.use(express.json());
 
-const middleWare = function(req, res, next){
-    console.log(' is middleware function in action');
-    next();
-};
-// app.use(middleWare);
-
-app.get('/', (req, res) => {
-    res.send("Hello, World");
+// Get all users
+app.get('/users', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM users');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.use("/items", itemsRoutes);
-
-//  middleware to handlie invalid route
-
-app.use((req, res, next) => {
-    const reqUrl = req.originalUrl;
-    return res.status(404).json({message: `404 error route not found ${reqUrl}`})
+// Get user by ID
+app.get('/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// middleWare to handle general Error
+// Create new user
+app.post('/users', async (req, res) => {
+  try {
+    const { name, email, age } = req.body;
+    const result = await pool.query(
+      'INSERT INTO users (name, email, age) VALUES ($1, $2, $3) RETURNING *',
+      [name, email, age]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-app.use((err, req, res, next) => {
-    return res.status(err.status || 500).json({  "error": "Intentional server error",
-  "status": 500});
-})
+// Update user
+app.put('/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, age } = req.body;
+    const result = await pool.query(
+      'UPDATE users SET name = $1, email = $2, age = $3 WHERE id = $4 RETURNING *',
+      [name, email, age, id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
+// Delete user
+app.delete('/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    res.json({ message: 'User deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-app.listen(PORT, console.log(`server is running on http://localhost:${PORT}`));
+// Start server
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
