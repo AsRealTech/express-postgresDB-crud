@@ -1,72 +1,48 @@
-My Express.js REST API
-A simple Express.js app demonstrating routing, 404 handling, and error middleware.
+Brief Documentation
 
-Setup Instructions
+ 🔹 How to Run
 
-git clone https://github.com/AsRealTech/restapi.git
-cd restapi
+1. Clone or download this project.
+2. Update `db.js` with your PostgreSQL credentials.
+3. Install dependencies:
+
+bash
 npm install
-npm start
 
-Server will run at http://localhost:5000
 
-API Routes
+4. Start the server:
 
-1. `GET /items`
-Returns a hello world message.
+bash
+node index.js
 
-Request:
+🔹 Test with Postman or curl
 
-GET /items HTTP/1.1
-Host: localhost:5000
+*GET* all users:
+GET http://localhost:3000/users
 
-Response (HTTP 200):
+*GET* user by ID:
+GET http://localhost:3000/users/1
 
+*POST* new user:
+
+json
+POST http://localhost:3000/users
 {
-  "message": "Hello World!"
+  "name": "Alice",
+  "email": "alice@example.com",
+  "age": 25
+}
+
+**PUT** update user:
+
+json
+PUT http://localhost:3000/users/1
+{
+  "name": "Alice Updated",
+  "email": "alice@newdomain.com",
+  "age": 26
 }
 
 
-2. `GET /itemserror`
-
-Simulates a server error.
-
-Request:
-
-GET /itemserror HTTP/1.1
-Host: localhost:5000
-
-Response (HTTP 500):
-
-{
-  "error": "Intentional server error",
-  "status": 500
-}
-
-3. Invalid Route Example
-
-Request:
-
-GET /items/unknown HTTP/1.1
-Host: localhost:5000
-
-
-Response (HTTP 404):
-
-{
-  "error": "Route not found",
-  "status": 404,
-  "path": "/items/unknown"
-}
-
-Testing with Postman
-
-1. Open Postman.
-2. Use GET http://localhost:5000/items
-3. Test GET http://localhost:5000/itemserror for error handling.
-4. Test any unknown route like GET http://localhost:5000/items/404test
-
-Built With:
-
-Node.js
-Express js
+**DELETE** user:
+DELETE http://localhost:3000/users/1
